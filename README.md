@@ -82,11 +82,6 @@ For a custom installation, specify the executable explicitly:
 .\scripts\setup.ps1 -CondaExe "D:\tools\miniconda3\Scripts\conda.exe"
 ```
 
-Selecting a Python interpreter in VS Code is a separate action: after setup,
-use **Ctrl+Shift+P → Python: Select Interpreter** and select
-`brainboxemb-dev-tools`. Conda does not need to be initialized in the terminal
-just to run the setup script.
-
 Without the script, the equivalent initial installation is:
 
 ```powershell
@@ -98,10 +93,6 @@ Later, after pulling changes to this repository:
 ```powershell
 conda env update --name brainboxemb-dev-tools --file environment.yml --prune
 ```
-
-If `conda activate` does not work in PowerShell, use
-`conda init powershell` **once**, then restart the terminal. This changes
-your shell initialization only; it is not done by the setup script.
 
 ## VS Code
 
