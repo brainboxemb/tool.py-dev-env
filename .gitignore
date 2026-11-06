@@ -1,0 +1,5 @@
+# Generated/locally installed environments and Python caches
+.conda/
+.venv/
+__pycache__/
+*.pyc
