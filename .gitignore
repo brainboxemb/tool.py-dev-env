@@ -3,3 +3,6 @@
 .venv/
 __pycache__/
 *.pyc
+
+# User-specific VS Code workspace configuration
+.vscode/settings.json

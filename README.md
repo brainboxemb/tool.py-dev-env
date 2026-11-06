@@ -66,17 +66,18 @@ activating a terminal are separate operations.
 ## Example: OpenSCAD model archive
 
 Inside a clone of
-[`2026-011-01.cad.model-archive`](https://github.com/brainboxemb/2026-011-01.cad.model-archive),
-with `brainboxemb-dev-tools` activated:
+[`2026-011-01.cad.model-archive`](https://github.com/brainboxemb/2026-011-01.cad.model-archive):
 
 ```powershell
-New-Item -ItemType Directory -Path ext -Force | Out-Null
-vcs import --input dependencies.repos ext
+.\bootstrap.ps1
 .\scripts\open-model.ps1
 ```
 
-This fetches the pinned NopSCADlib dependency and opens the model in the
-locally installed OpenSCAD GUI. No local Docker installation is required.
+The archive's bootstrap script creates `ext/` and fetches pinned NopSCADlib
+using `vcs2l`. It uses the active `vcs` command or falls back to invoking
+`brainboxemb-dev-tools` through Conda, so no manual directory creation is
+necessary. The second command launches the installed OpenSCAD GUI. No local
+Docker installation is required.
 
 ## Maintenance
 
