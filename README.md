@@ -1,97 +1,85 @@
 # tool.py-dev-env
 
-Version-controlled Conda environment for **shared Python development tools and utilities**.
+Version-controlled Conda environment for shared Python development utilities.
+The environment is named **`brainboxemb-dev-tools`** and can be reused across
+repositories. The first tool is [vcs2l](https://github.com/ros-infrastructure/vcs2l)
+for checking out pinned dependencies from `dependencies.repos`.
 
-The repository stores only the **environment definition**; the installed
-environment lives locally on Windows. It is not part of the OpenSCAD model
-archive and is unrelated to the CI Docker images.
+Project-specific Python dependencies belong in separate environments.
 
-## Purpose
+## Install (Windows)
 
-One reusable Conda environment named **`brainboxemb-dev-tools`** for command-line
-developer utilities shared by multiple repositories. The initial tool is
-[vcs2l](https://github.com/ros-infrastructure/vcs2l), which checks out the
-pinned external dependencies described in a project's `dependencies.repos`.
+Requires Miniconda, Miniforge or another Conda distribution. Miniconda can
+optionally be installed or upgraded through Chocolatey (administrator terminal):
 
-Project-specific Python runtimes and packages should stay in their own
-environments instead of accumulating here.
+```powershell
+choco install miniconda3 -y
+# Or, if already installed:
+choco upgrade miniconda3 -y
+```
 
-## Install on Windows
+Before upgrading an existing installation, make sure any Conda environments
+you need to keep are backed up.
 
-Prerequisite: Conda available in PowerShell. A minimal installation such as
-[Miniforge](https://github.com/conda-forge/miniforge) is suitable; Anaconda
-or Miniconda can also be used.
-
-Clone this repository. From its root in PowerShell:
+From the root of this repository in PowerShell:
 
 ```powershell
 .\scripts\setup.ps1
 ```
 
-The script creates `brainboxemb-dev-tools` if needed, or updates it from
-[`environment.yml`](environment.yml) if it already exists.
-It checks that the `vcs` command is available in the environment.
+The script reads [`environment.yml`](environment.yml), creates or updates
+`brainboxemb-dev-tools`, and checks whether `vcs` is installed. It uses
+`conda.exe` directly, so activating Conda first is not necessary. The script
+does not change PATH, PowerShell profiles or VS Code settings.
 
-Without the script, the equivalent initial installation is:
-
-```powershell
-conda env create -f environment.yml
-```
-
-Later, after pulling changes to this repository:
+For a non-standard installation path:
 
 ```powershell
-conda env update --name brainboxemb-dev-tools --file environment.yml --prune
+.\scripts\setup.ps1 -CondaExe "<conda-install-dir>\Scripts\conda.exe"
 ```
 
-If `conda activate` does not work in PowerShell, use
-`conda init powershell` **once**, then restart the terminal. This changes
-your shell initialization only; it is not done by the setup script.
+The script has built-in PowerShell documentation:
 
-## VS Code
+```powershell
+Get-Help .\scripts\setup.ps1 -Full
+```
 
-Open an integrated PowerShell terminal and run:
+## Use in VS Code
+
+After installation, press **Ctrl+Shift+P**, choose **Python: Select
+Interpreter**, and select **`brainboxemb-dev-tools`**. Open a new integrated
+terminal to use the selected interpreter.
+
+You can also explicitly activate the environment in an initialized PowerShell
+terminal:
 
 ```powershell
 conda activate brainboxemb-dev-tools
 vcs --help
 ```
 
-If you are developing **Python code**, choose the interpreter using
-**Python: Select Interpreter** and select `brainboxemb-dev-tools`.
-
-**Git actions in VS Code do not need Python.** VS Code Source Control uses
-Git directly. Interpreter selection is only relevant when running Python
-code or terminals where the Conda environment is active.
+If PowerShell has not been initialized for Conda, run the Conda hook from your
+Miniconda installation first, or initialize PowerShell once with
+`conda init powershell` and reopen VS Code. Selecting an interpreter and
+activating a terminal are separate operations.
 
 ## Example: OpenSCAD model archive
 
-In the local clone of
-[`2026-011-01.cad.model-archive`](https://github.com/brainboxemb/2026-011-01.cad.model-archive):
+Inside a clone of
+[`2026-011-01.cad.model-archive`](https://github.com/brainboxemb/2026-011-01.cad.model-archive),
+with `brainboxemb-dev-tools` activated:
 
 ```powershell
-conda activate brainboxemb-dev-tools
 New-Item -ItemType Directory -Path ext -Force | Out-Null
 vcs import --input dependencies.repos ext
 .\scripts\open-model.ps1
 ```
 
-This fetches the repository-pinned NopSCADlib checkout and opens the example
-in your **locally installed OpenSCAD GUI**. No Docker or local documentation
-generation is needed.
-
-Alternatively, without activating the environment:
-
-```powershell
-conda run -n brainboxemb-dev-tools vcs import --input dependencies.repos ext
-```
+This fetches the pinned NopSCADlib dependency and opens the model in the
+locally installed OpenSCAD GUI. No local Docker installation is required.
 
 ## Maintenance
 
-`environment.yml` is the editable, version-controlled source of truth.
-Keep dependencies narrow and pin important CLI versions. Do **not**
-commit the output of `conda env export`: it would capture large amounts
-of machine-specific, transitive dependency information.
-
-The `brainboxemb-dev-tools` name is intentionally stable across projects. CI builds
-use their own containers/environments and do not depend on this local one.
+Update [`environment.yml`](environment.yml) to change tools, then rerun
+`setup.ps1`. Keep the dependencies limited to shared CLI utilities and avoid
+committing a machine-specific `conda env export`.
