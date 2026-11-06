@@ -1,6 +1,6 @@
 # Reusable Windows developer CLI tools.
 # Project-specific Python dependencies belong in their own environments.
-name: dev-tools
+name: brainboxemb-dev-tools
 
 channels:
   - conda-forge
