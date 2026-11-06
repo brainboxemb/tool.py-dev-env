@@ -28,6 +28,10 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if ($CondaExe -and -not (Test-Path -LiteralPath $CondaExe -PathType Leaf)) {
+    throw "Specified Conda executable not found: $CondaExe"
+}
+
 # 1. Find the executable, not the PowerShell 'conda' function/alias.
 $onPath = Get-Command conda.exe -CommandType Application -ErrorAction SilentlyContinue
 $candidates = @(
