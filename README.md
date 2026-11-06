@@ -18,23 +18,54 @@ environments instead of accumulating here.
 
 ## Install on Windows
 
-Prerequisite: Conda available in PowerShell. A minimal installation such as
-[Miniforge](https://github.com/conda-forge/miniforge) is suitable; Anaconda
-or Miniconda can also be used.
+### 1. Install or upgrade Conda
 
-Clone this repository. From its root in PowerShell:
+Use an existing Miniconda, Miniforge or Anaconda installation. On Windows,
+Miniconda can be managed by [Chocolatey](https://community.chocolatey.org/packages/miniconda3).
+Check whether Chocolatey already manages it:
+
+```powershell
+choco list --limit-output | Select-String "miniconda|miniforge|anaconda"
+```
+
+When Chocolatey manages `miniconda3`, upgrade from an **administrator
+PowerShell**:
+
+```powershell
+choco upgrade miniconda3 -y
+```
+
+If it is not installed, `choco install miniconda3 -y` is an option.
+An upgrade may replace the existing installation directory: check and back up
+any environments you need to keep **before** upgrading.
+
+After installation, use a **new terminal** and verify the installed Python
+can load OpenSSL (the base Python version need not match the environment below):
+
+```powershell
+& "C:\tools\miniconda3\python.exe" --version
+& "C:\tools\miniconda3\python.exe" -c "import ssl; print(ssl.OPENSSL_VERSION)"
+```
+
+The `C:\tools\miniconda3` path is an example used on this machine;
+adjust it if Miniconda was installed elsewhere. The SSL check must succeed
+before Conda can download packages over HTTPS.
+
+### 2. Create or update the development environment
+
+Clone this repository and run from its root in **VS Code PowerShell**:
 
 ```powershell
 .\scripts\setup.ps1
 ```
 
-The script creates `brainboxemb-dev-tools` if needed, or updates it from
-[`environment.yml`](environment.yml) if it already exists.
-It checks that the `vcs` command is available in the environment.
+The script creates or updates `brainboxemb-dev-tools` from
+[`environment.yml`](environment.yml) and checks the `vcs` command.
+**You do not have to activate `base` first.**
 
 ### How the setup script works
 
-`scripts/setup.ps1` has PowerShell comment-based help (`Get-Help .\\scripts\\setup.ps1 -Full`).
+`scripts/setup.ps1` has PowerShell comment-based help (`Get-Help .\scripts\setup.ps1 -Full`).
 It performs only three operations:
 
 1. Find the **real `conda.exe`** (not the interactive PowerShell `conda` hook).
@@ -44,11 +75,11 @@ It performs only three operations:
 
 There is **no JSON parsing or environment-list bookkeeping**. The script never
 changes PATH, your PowerShell profile or VS Code's selected interpreter.
-It recognizes common installations, including `C:\\tools\\miniconda3`.
+It recognizes common installations, including `C:\tools\miniconda3`.
 For a custom installation, specify the executable explicitly:
 
 ```powershell
-.\\scripts\\setup.ps1 -CondaExe "D:\\tools\\miniconda3\\Scripts\\conda.exe"
+.\scripts\setup.ps1 -CondaExe "D:\tools\miniconda3\Scripts\conda.exe"
 ```
 
 Selecting a Python interpreter in VS Code is a separate action: after setup,
@@ -74,19 +105,71 @@ your shell initialization only; it is not done by the setup script.
 
 ## VS Code
 
-Open an integrated PowerShell terminal and run:
+After setup, select the interpreter with **Ctrl+Shift+P → Python: Select
+Interpreter → brainboxemb-dev-tools**. Close any old integrated terminal and
+open a new one. Selecting the interpreter is **not** the same as initializing
+the Conda command in PowerShell; automatic terminal activation depends on the
+VS Code Python extension and the shell setup.
+
+To activate the environment explicitly in an integrated PowerShell terminal:
 
 ```powershell
+& "C:\tools\miniconda3\shell\condabin\conda-hook.ps1"
 conda activate brainboxemb-dev-tools
 vcs --help
 ```
 
-If you are developing **Python code**, choose the interpreter using
-**Python: Select Interpreter** and select `brainboxemb-dev-tools`.
+If you want `conda activate` to work automatically in future PowerShell
+sessions, run `conda init powershell` once in an initialized Conda prompt,
+then restart VS Code. This is optional; the setup script itself uses
+`conda.exe` directly and does not modify your profile or PATH.
 
 **Git actions in VS Code do not need Python.** VS Code Source Control uses
-Git directly. Interpreter selection is only relevant when running Python
-code or terminals where the Conda environment is active.
+Git directly. Choose a Python interpreter only when you need to run Python
+code or tools in that environment.
+
+## Troubleshooting
+
+### Conda shows `HTTP 000 CONNECTION FAILED`
+
+Check whether **the Conda base Python** can load OpenSSL:
+
+```powershell
+& "C:\tools\miniconda3\python.exe" -c "import ssl; print(ssl.OPENSSL_VERSION)"
+```
+
+If this fails with `ImportError: DLL load failed while importing _ssl`,
+Conda cannot make HTTPS requests. This is different from a certificate
+verification error. Check whether the installation is properly activated and
+whether its OpenSSL DLLs are present under `Library\bin`. If the installation
+is old or damaged, upgrade/reinstall Miniconda; **do not disable SSL
+verification** as a workaround.
+
+If `curl.exe -I https://conda.anaconda.org/conda-forge/win-64/repodata.json`
+returns HTTP 200, that confirms Windows HTTPS works, but **does not prove
+Conda's Python/OpenSSL works**.
+
+### Chocolatey upgrade fails after uninstalling old Miniconda
+
+An interrupted upgrade may remove the old directory while Chocolatey still
+lists the old package version. Check:
+
+```powershell
+Test-Path "C:\tools\miniconda3"
+choco list --limit-output | Select-String "miniconda"
+```
+
+If the old install directory is gone, retry `choco upgrade miniconda3 -y`
+from an administrator PowerShell. If it fails again, inspect
+`C:\ProgramData\chocolatey\logs\chocolatey.log` before doing any manual
+cleanup. Check for important Conda environments/backups before deleting files.
+
+### `ConvertFrom-Json` fails in an older setup script
+
+Earlier versions queried `conda env list --json` through the PowerShell
+`conda` hook. The current script avoids JSON entirely and invokes
+`conda.exe` directly. Update your local checkout if you still see the
+`ConvertFrom-Json` line.
 
 ## Example: OpenSCAD model archive
 
