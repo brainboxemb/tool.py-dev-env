@@ -32,19 +32,29 @@ The script creates `brainboxemb-dev-tools` if needed, or updates it from
 [`environment.yml`](environment.yml) if it already exists.
 It checks that the `vcs` command is available in the environment.
 
-Selecting a Python interpreter in VS Code does **not** automatically make
-`conda` available in the integrated PowerShell terminal. On some Windows
-setups the interactive `conda` PowerShell hook also fails to return valid
-JSON for `conda env list --json`. The setup script therefore calls the real
-`conda.exe` directly. It recognizes the installation at
-`C:\tools\miniconda3\Scripts\conda.exe` as well as common installation paths. If it cannot find yours, specify the executable:
+### How the setup script works
+
+`scripts/setup.ps1` has PowerShell comment-based help (`Get-Help .\\scripts\\setup.ps1 -Full`).
+It performs only three operations:
+
+1. Find the **real `conda.exe`** (not the interactive PowerShell `conda` hook).
+2. Run `conda env update --name brainboxemb-dev-tools --file environment.yml --prune`.
+   This creates the environment if it is missing, or updates it if it exists.
+3. Check `vcs --help` inside the environment via `conda run`.
+
+There is **no JSON parsing or environment-list bookkeeping**. The script never
+changes PATH, your PowerShell profile or VS Code's selected interpreter.
+It recognizes common installations, including `C:\\tools\\miniconda3`.
+For a custom installation, specify the executable explicitly:
 
 ```powershell
-.\scripts\setup.ps1 -CondaExe "<conda-installation>\Scripts\conda.exe"
+.\\scripts\\setup.ps1 -CondaExe "D:\\tools\\miniconda3\\Scripts\\conda.exe"
 ```
 
-The script itself does not change your PATH or PowerShell profile. You can
-create/update the environment **without** running `conda init powershell`.
+Selecting a Python interpreter in VS Code is a separate action: after setup,
+use **Ctrl+Shift+P → Python: Select Interpreter** and select
+`brainboxemb-dev-tools`. Conda does not need to be initialized in the terminal
+just to run the setup script.
 
 Without the script, the equivalent initial installation is:
 
