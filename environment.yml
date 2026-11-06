@@ -1,0 +1,12 @@
+# Reusable Windows developer CLI tools.
+# Project-specific Python dependencies belong in their own environments.
+name: brainboxemb-dev-tools
+
+channels:
+  - conda-forge
+
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - vcs2l==1.1.7
