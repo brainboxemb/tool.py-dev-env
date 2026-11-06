@@ -8,7 +8,7 @@ archive and is unrelated to the CI Docker images.
 
 ## Purpose
 
-One reusable Conda environment named **`dev-tools`** for command-line
+One reusable Conda environment named **`brainboxemb-dev-tools`** for command-line
 developer utilities shared by multiple repositories. The initial tool is
 [vcs2l](https://github.com/ros-infrastructure/vcs2l), which checks out the
 pinned external dependencies described in a project's `dependencies.repos`.
@@ -28,7 +28,7 @@ Clone this repository. From its root in PowerShell:
 .\scripts\setup.ps1
 ```
 
-The script creates `dev-tools` if needed, or updates it from
+The script creates `brainboxemb-dev-tools` if needed, or updates it from
 [`environment.yml`](environment.yml) if it already exists.
 It checks that the `vcs` command is available in the environment.
 
@@ -41,7 +41,7 @@ conda env create -f environment.yml
 Later, after pulling changes to this repository:
 
 ```powershell
-conda env update --name dev-tools --file environment.yml --prune
+conda env update --name brainboxemb-dev-tools --file environment.yml --prune
 ```
 
 If `conda activate` does not work in PowerShell, use
@@ -53,12 +53,12 @@ your shell initialization only; it is not done by the setup script.
 Open an integrated PowerShell terminal and run:
 
 ```powershell
-conda activate dev-tools
+conda activate brainboxemb-dev-tools
 vcs --help
 ```
 
 If you are developing **Python code**, choose the interpreter using
-**Python: Select Interpreter** and select `dev-tools`.
+**Python: Select Interpreter** and select `brainboxemb-dev-tools`.
 
 **Git actions in VS Code do not need Python.** VS Code Source Control uses
 Git directly. Interpreter selection is only relevant when running Python
@@ -70,7 +70,7 @@ In the local clone of
 [`2026-011-01.cad.model-archive`](https://github.com/brainboxemb/2026-011-01.cad.model-archive):
 
 ```powershell
-conda activate dev-tools
+conda activate brainboxemb-dev-tools
 New-Item -ItemType Directory -Path ext -Force | Out-Null
 vcs import --input dependencies.repos ext
 .\scripts\open-model.ps1
@@ -83,7 +83,7 @@ generation is needed.
 Alternatively, without activating the environment:
 
 ```powershell
-conda run -n dev-tools vcs import --input dependencies.repos ext
+conda run -n brainboxemb-dev-tools vcs import --input dependencies.repos ext
 ```
 
 ## Maintenance
@@ -93,5 +93,5 @@ Keep dependencies narrow and pin important CLI versions. Do **not**
 commit the output of `conda env export`: it would capture large amounts
 of machine-specific, transitive dependency information.
 
-The `dev-tools` name is intentionally stable across projects. CI builds
+The `brainboxemb-dev-tools` name is intentionally stable across projects. CI builds
 use their own containers/environments and do not depend on this local one.
