@@ -1,4 +1,4 @@
-# Create or update the shared dev-tools Conda environment from any directory.
+# Create or update the shared brainboxemb-dev-tools Conda environment from any directory.
 # No global Conda settings or PowerShell profiles are changed.
 [CmdletBinding()]
 param()
@@ -15,13 +15,13 @@ if ($LASTEXITCODE -ne 0) {
     throw "Failed to list Conda environments."
 }
 
-$exists = @($envList.envs | Where-Object { (Split-Path $_ -Leaf) -eq "dev-tools" }).Count -gt 0
+$exists = @($envList.envs | Where-Object { (Split-Path $_ -Leaf) -eq "brainboxemb-dev-tools" }).Count -gt 0
 
 if ($exists) {
-    Write-Host "Updating existing 'dev-tools' environment..."
-    conda env update --name dev-tools --file $environmentFile --prune
+    Write-Host "Updating existing 'brainboxemb-dev-tools' environment..."
+    conda env update --name brainboxemb-dev-tools --file $environmentFile --prune
 } else {
-    Write-Host "Creating 'dev-tools' environment..."
+    Write-Host "Creating 'brainboxemb-dev-tools' environment..."
     conda env create --file $environmentFile
 }
 
@@ -31,9 +31,9 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "Checking vcs2l..."
-conda run --name dev-tools vcs --help | Out-Null
+conda run --name brainboxemb-dev-tools vcs --help | Out-Null
 if ($LASTEXITCODE -ne 0) {
-    throw "'vcs' is not available inside dev-tools."
+    throw "'vcs' is not available inside brainboxemb-dev-tools."
 }
 
-Write-Host "Done. Activate in your VS Code terminal: conda activate dev-tools"
+Write-Host "Done. Activate in your VS Code terminal: conda activate brainboxemb-dev-tools"
