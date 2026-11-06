@@ -33,15 +33,18 @@ The script creates `brainboxemb-dev-tools` if needed, or updates it from
 It checks that the `vcs` command is available in the environment.
 
 Selecting a Python interpreter in VS Code does **not** automatically make
-`conda` available in the integrated PowerShell terminal. The setup script
-can also locate common Miniconda/Miniforge installations without an initialized
-shell. If it cannot find yours, specify the executable:
+`conda` available in the integrated PowerShell terminal. On some Windows
+setups the interactive `conda` PowerShell hook also fails to return valid
+JSON for `conda env list --json`. The setup script therefore calls the real
+`conda.exe` directly. It recognizes the installation at
+`C:\tools\miniconda3\Scripts\conda.exe` as well as common installation paths. If it cannot find yours, specify the executable:
 
 ```powershell
 .\scripts\setup.ps1 -CondaExe "<conda-installation>\Scripts\conda.exe"
 ```
 
-The script itself does not change your PATH or PowerShell profile.
+The script itself does not change your PATH or PowerShell profile. You can
+create/update the environment **without** running `conda init powershell`.
 
 Without the script, the equivalent initial installation is:
 
